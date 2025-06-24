@@ -1,4 +1,16 @@
-export const dummyIPO = [
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'
+
+export const SECTORS = [
+  'Tech',
+  'Finance',
+  'Pharma',
+  'Automobile',
+  'Energy',
+  'Telecom',
+  'Retail'
+]
+
+export const dummyIPOs = [
     {
         id : "1",
         company : "Tata Technologies",
