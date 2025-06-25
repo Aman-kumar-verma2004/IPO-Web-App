@@ -1,3 +1,5 @@
+import {Link} from "react-router-dom"
+
 export default function IPOCard({ ipo }) {
   return (
     <div className="bg-black text-white border border-purple-600 rounded-xl p-5 hover:shadow-lg transition duration-300">
@@ -7,9 +9,12 @@ export default function IPOCard({ ipo }) {
         <span>₹{ipo.priceBand}</span>
         <span>Lot: {ipo.lotSize} shares</span>
       </div>
-      <button className="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded">
+      <Link
+        to={`/ipo/${ipo.id}`}
+        className="block mt-4 w-full bg-purple-600 hover:bg-purple-700 text-center text-white py-2 rounded"
+      >
         Apply Now
-      </button>
+      </Link>
     </div>
   )
 }
