@@ -10,6 +10,10 @@ export default function FilterBar({ selectedSector, setSector, selectedDate, set
         <option value="Tech">Tech</option>
         <option value="Finance">Finance</option>
         <option value="Energy">Energy</option>
+        <option value="Pharma">Pharma</option>
+        <option value="Automobile">Automobile</option>
+        <option value="Telecom">Telecom</option>
+        <option value="Retail">Retail</option>
       </select>
 
       <input
