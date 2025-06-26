@@ -1,21 +1,33 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import axios from 'axios'
 
 export default function Register() {
   const navigate = useNavigate()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoading(true)
 
-    // TODO: Add backend integration here
-    console.log({ name, email, password })
+    try {
+      const res = await axios.post('http://localhost:5000/api/auth/register', {
+        name,
+        email,
+        password
+      })
 
-    // ✅ Simulate registration success
-    alert('Registered Successfully!')
-    navigate('/admin') // Redirect to login page
+      alert(res.data.msg || 'Registered Successfully!')
+      navigate('/admin') // Redirect to login
+    } catch (err) {
+      console.error(err)
+      alert(err.response?.data?.msg || 'Registration failed')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -53,9 +65,10 @@ export default function Register() {
 
         <button
           type="submit"
+          disabled={loading}
           className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded"
         >
-          Register
+          {loading ? 'Registering...' : 'Register'}
         </button>
 
         <p className="text-center text-sm text-zinc-400 mt-4">
