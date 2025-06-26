@@ -1,20 +1,37 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import axios from 'axios'
 
 export default function AdminLogin() {
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
+    setLoading(true)
 
-    
-    if (email === 'admin@example.com' && password === 'admin123') {
-      alert('Login Successful')
+    try {
+      const res = await axios.post('http://localhost:5000/api/auth/login', {
+        email,
+        password
+      })
+
+      alert(res.data.msg)
+
+      // Optional: Save token to localStorage (for future auth)
+      localStorage.setItem('token', res.data.token)
+
+      // Redirect to Admin Dashboard
       navigate('/admin/dashboard')
-    } else {
-      alert('Invalid credentials')
+    } catch (err) {
+      console.error(err)
+      alert(
+        err.response?.data?.msg || 'Login failed. Please check credentials.'
+      )
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -24,7 +41,9 @@ export default function AdminLogin() {
         onSubmit={handleLogin}
         className="bg-zinc-900 p-6 rounded-xl w-full max-w-sm shadow-md border border-purple-600"
       >
-        <h2 className="text-2xl text-purple-500 font-bold mb-4 text-center">Admin Login</h2>
+        <h2 className="text-2xl text-purple-500 font-bold mb-4 text-center">
+          Admin Login
+        </h2>
 
         <input
           type="email"
@@ -46,9 +65,14 @@ export default function AdminLogin() {
 
         <button
           type="submit"
-          className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded"
+          disabled={loading}
+          className={`w-full py-2 rounded ${
+            loading
+              ? 'bg-purple-400 cursor-not-allowed'
+              : 'bg-purple-600 hover:bg-purple-700'
+          } text-white`}
         >
-          Login
+          {loading ? 'Logging in...' : 'Login'}
         </button>
 
         <p className="text-center text-sm text-zinc-400 mt-4">
