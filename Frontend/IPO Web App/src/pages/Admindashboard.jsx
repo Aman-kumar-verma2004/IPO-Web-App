@@ -1,9 +1,33 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { dummyIPOs } from '../utils/constants'
+import axios from 'axios'
 
 export default function AdminDashboard() {
-  const [ipos, setIPOs] = useState(dummyIPOs)
+  const [ipos, setIpos] = useState([])
+
+  const fetchIPOs = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/ipos')
+      setIpos(res.data)
+    } catch (err) {
+      console.error('❌ Failed to fetch IPOs:', err)
+    }
+  }
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this IPO?')) return;
+    try {
+      await axios.delete(`http://localhost:5000/api/ipos/${id}`)
+      setIpos(ipos.filter(ipo => ipo.id !== id))
+      alert('IPO deleted successfully!')
+    } catch (err) {
+      console.error('❌ Error deleting IPO:', err)
+    }
+  }
+
+  useEffect(() => {
+    fetchIPOs()
+  }, [])
 
   return (
     <div className="bg-black text-white min-h-screen p-6">
@@ -31,7 +55,7 @@ export default function AdminDashboard() {
               <td className="p-3">{ipo.openDate} → {ipo.closeDate}</td>
               <td className="p-3 space-x-2">
                 <Link to={`/admin/edit/${ipo.id}`} className="text-purple-400 hover:underline">Edit</Link>
-                <button className="text-red-500 hover:underline">Delete</button>
+                <button onClick={() => handleDelete(ipo.id)} className="text-red-500 hover:underline">Delete</button>
               </td>
             </tr>
           ))}
