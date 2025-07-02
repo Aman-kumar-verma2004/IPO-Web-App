@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom' // ✅ import navigation
 
 export default function AddEditIPO() {
   const [company, setCompany] = useState('')
@@ -10,14 +11,16 @@ export default function AddEditIPO() {
   const [closeDate, setCloseDate] = useState('')
   const [rhpLink, setRhpLink] = useState('')
 
+  const navigate = useNavigate() // ✅ create navigate instance
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
     try {
-      const res = await axios.post('http://localhost:5000/api/ipos', {
+      await axios.post('http://localhost:5000/api/ipos', {
         company,
         priceBand,
-        lotSize,
+        lotSize: parseInt(lotSize),
         sector,
         openDate,
         closeDate,
@@ -25,14 +28,7 @@ export default function AddEditIPO() {
       })
 
       alert('IPO added successfully!')
-      // Optionally clear the form:
-      setCompany('')
-      setPriceBand('')
-      setLotSize('')
-      setSector('')
-      setOpenDate('')
-      setCloseDate('')
-      setRhpLink('')
+      navigate('/admin/dashboard') // ✅ redirect to dashboard
     } catch (error) {
       console.error(error)
       alert('Error adding IPO')
