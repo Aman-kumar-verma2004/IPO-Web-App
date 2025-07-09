@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom' // ✅ import navigation
+import { useParams, useNavigate } from 'react-router-dom'
 
 export default function AddEditIPO() {
   const [company, setCompany] = useState('')
@@ -10,34 +10,63 @@ export default function AddEditIPO() {
   const [openDate, setOpenDate] = useState('')
   const [closeDate, setCloseDate] = useState('')
   const [rhpLink, setRhpLink] = useState('')
+  const { id } = useParams()
+  const navigate = useNavigate()
 
-  const navigate = useNavigate() // ✅ create navigate instance
+  // Fetch existing IPO details if editing
+  useEffect(() => {
+    if (id) {
+      axios.get(`http://localhost:5000/api/ipos/${id}`)
+        .then(res => {
+          const ipo = res.data
+          setCompany(ipo.company)
+          setPriceBand(ipo.priceBand)
+          setLotSize(ipo.lotSize.toString())
+          setSector(ipo.sector)
+          setOpenDate(ipo.openDate)
+          setCloseDate(ipo.closeDate)
+          setRhpLink(ipo.rhpLink || '')
+        })
+        .catch(err => {
+          console.error("❌ Error fetching IPO:", err)
+          alert("Failed to fetch IPO details")
+        })
+    }
+  }, [id])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    const payload = {
+      company,
+      priceBand,
+      lotSize: parseInt(lotSize),
+      sector,
+      openDate,
+      closeDate,
+      rhpLink
+    }
 
     try {
-      await axios.post('http://localhost:5000/api/ipos', {
-        company,
-        priceBand,
-        lotSize: parseInt(lotSize),
-        sector,
-        openDate,
-        closeDate,
-        rhpLink,
-      })
+      if (id) {
+        // Update IPO
+        await axios.put(`http://localhost:5000/api/ipos/${id}`, payload)
+        alert('IPO updated successfully!')
+      } else {
+        // Create new IPO
+        await axios.post('http://localhost:5000/api/ipos', payload)
+        alert('IPO added successfully!')
+      }
 
-      alert('IPO added successfully!')
-      navigate('/admin/dashboard') // ✅ redirect to dashboard
+      navigate('/admin/dashboard')
     } catch (error) {
       console.error(error)
-      alert('Error adding IPO')
+      alert('Error saving IPO')
     }
   }
 
   return (
     <div className="bg-black text-white min-h-screen p-6">
-      <h2 className="text-2xl font-bold text-purple-500 mb-4">Add / Edit IPO</h2>
+      <h2 className="text-2xl font-bold text-purple-500 mb-4">{id ? "Edit IPO" : "Add IPO"}</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4 max-w-xl">
         <input
@@ -92,7 +121,7 @@ export default function AddEditIPO() {
           type="submit"
           className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
         >
-          Save IPO
+          {id ? "Update IPO" : "Save IPO"}
         </button>
       </form>
     </div>
